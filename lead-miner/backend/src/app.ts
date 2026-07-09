@@ -8,13 +8,21 @@ export function createApp() {
   const app = express();
 
   // CORS: "*" (or empty) → reflect any origin; otherwise an allow-list.
-  const origins = env.corsOrigin
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const corsOrigin =
-    origins.length === 0 || origins.includes('*') ? true : origins;
-  app.use(cors({ origin: corsOrigin }));
+  // Trailing slashes are normalized so "https://x/" and "https://x" both match.
+  const norm = (s: string) => s.trim().replace(/\/+$/, '');
+  const allow = env.corsOrigin.split(',').map(norm).filter(Boolean);
+  const allowAll = allow.length === 0 || allow.includes('*');
+  app.use(
+    cors({
+      origin: allowAll
+        ? true
+        : (origin, cb) => {
+            // Non-browser clients (curl, health checks) send no Origin — allow.
+            if (!origin || allow.includes(norm(origin))) cb(null, true);
+            else cb(null, false);
+          },
+    }),
+  );
   app.use(express.json({ limit: '2mb' }));
 
   // Health check
