@@ -1,0 +1,64 @@
+{
+  "$comment": "Reference examples of Input/Output mappings stored on each actor row. Copy the relevant block into actors.input_schema / actors.output_mapping. Input placeholders {{x}} reference SearchParams fields. Output values are dot/array paths into the raw item; '@' copies the whole item.",
+
+  "google_maps": {
+    "input_schema": {
+      "searchStringsArray": "{{keyword}}",
+      "locationQuery": "{{city}} {{country}}",
+      "maxCrawledPlacesPerSearch": "{{limit}}"
+    },
+    "output_mapping": {
+      "company": "title",
+      "phone": "phone",
+      "website": "website",
+      "email": "email",
+      "industry": "categoryName",
+      "country": "countryCode",
+      "raw": "@"
+    },
+    "default_input": { "language": "en" }
+  },
+
+  "apollo": {
+    "input_schema": {
+      "query": "{{keyword}}",
+      "industry": "{{industry}}",
+      "country": "{{country}}",
+      "limit": "{{limit}}"
+    },
+    "output_mapping": {
+      "first_name": "first_name",
+      "last_name": "last_name",
+      "title": "title",
+      "company": "organization_name",
+      "email": "email",
+      "phone": "phone",
+      "linkedin": "linkedin_url",
+      "industry": "industry",
+      "country": "country",
+      "employee_count": "employees",
+      "revenue": "revenue",
+      "raw": "@"
+    },
+    "default_input": { "limit": 100 }
+  },
+
+  "linkedin": {
+    "input_schema": {
+      "searchUrl": "{{linkedin_url}}",
+      "keyword": "{{keyword}}",
+      "limit": "{{limit}}"
+    },
+    "output_mapping": {
+      "first_name": "firstName",
+      "last_name": "lastName",
+      "title": "title",
+      "company": "companyName",
+      "linkedin": "profileUrl",
+      "industry": "industry",
+      "country": "location",
+      "raw": "@"
+    },
+    "default_input": {}
+  }
+}

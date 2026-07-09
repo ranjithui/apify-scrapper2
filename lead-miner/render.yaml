@@ -1,0 +1,33 @@
+# Render Blueprint — deploys the Lead Mining Platform backend.
+# https://render.com  →  New  →  Blueprint  →  point at this repo.
+# Set the secret env vars (marked sync:false) in the Render dashboard.
+services:
+  - type: web
+    name: lead-miner-backend
+    runtime: docker
+    dockerfilePath: ./docker/Dockerfile.backend
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 4000
+      - key: NODE_ENV
+        value: production
+      # Set this to your Vercel frontend URL after the frontend is deployed,
+      # e.g. https://lead-miner.vercel.app
+      - key: CORS_ORIGIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: APIFY_TOKEN
+        sync: false
+      - key: FAILOVER_ENABLED
+        value: 'false'
+      - key: SYNC_JOBS
+        value: 'false'

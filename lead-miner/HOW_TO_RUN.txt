@@ -1,0 +1,133 @@
+======================================================================
+ LEAD MINING PLATFORM — HOW TO RUN
+======================================================================
+
+Everything lives in the  lead-miner/  folder:
+
+  lead-miner/
+    frontend/    Next.js dashboard   (port 3000)
+    backend/     Express API         (port 4000)
+    database/    Supabase SQL files
+    docker/      Dockerfiles + compose
+    docs/        SETUP.md, API.md, ARCHITECTURE.md
+
+----------------------------------------------------------------------
+ PREREQUISITES
+----------------------------------------------------------------------
+  - Node.js 20+  (check:  node --version)
+  - A free Supabase account   -> https://supabase.com
+  - A free Apify account      -> https://apify.com
+  (Docker Desktop is optional — only for the "Option B" path.)
+
+
+======================================================================
+ STEP 1 — SET UP THE DATABASE (Supabase)
+======================================================================
+1. Go to https://supabase.com and create a new project.
+2. In the left menu open  "SQL Editor".
+3. Run these three files IN ORDER (open each, paste, click "Run"):
+       database/schema.sql
+       database/rls.sql
+       database/seed.sql
+4. Open  Project Settings  ->  API  and copy these 3 values
+   (you will paste them in Step 2):
+       Project URL          ->  SUPABASE_URL
+       anon public key      ->  SUPABASE_ANON_KEY
+       service_role key     ->  SUPABASE_SERVICE_ROLE_KEY   (keep secret!)
+
+
+======================================================================
+ STEP 2 — GET YOUR APIFY TOKEN
+======================================================================
+1. Log in at https://apify.com
+2. Console -> Settings -> Integrations -> API tokens
+3. Copy the token (starts with "apify_api_...").  -> APIFY_TOKEN
+
+
+======================================================================
+ OPTION A — RUN LOCALLY (recommended for development)
+======================================================================
+
+--- BACKEND (Terminal 1) --------------------------------------------
+  cd lead-miner/backend
+  copy .env.example .env         (Windows CMD)
+      # or:  cp .env.example .env        (PowerShell / Git Bash)
+  # open .env and fill in the 4 values from Step 1 & 2:
+  #   SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, APIFY_TOKEN
+  npm install
+  npm run dev
+
+  Backend is up when you see:
+      "Lead Mining Platform API listening on :4000"
+  Test it:  open  http://localhost:4000/health   -> should show status "ok"
+
+--- CREATE YOUR FIRST (ADMIN) USER ----------------------------------
+  With the backend running, in a new terminal run:
+
+  curl -X POST http://localhost:4000/signup ^
+    -H "Content-Type: application/json" ^
+    -d "{\"email\":\"you@example.com\",\"password\":\"secret123\",\"full_name\":\"You\",\"role\":\"admin\"}"
+
+  (On PowerShell use ` instead of ^ for line breaks, or put it all on one line.)
+
+--- FRONTEND (Terminal 2) -------------------------------------------
+  cd lead-miner/frontend
+  copy .env.local.example .env.local     (Windows CMD)
+      # or:  cp .env.local.example .env.local
+  npm install
+  npm run dev
+
+  Open  http://localhost:3000  and sign in with the user you just created.
+
+
+======================================================================
+ OPTION B — RUN WITH DOCKER
+======================================================================
+  cd lead-miner/docker
+  copy .env.example .env          (then fill in Supabase + Apify keys)
+  docker compose up --build
+
+  Frontend -> http://localhost:3000
+  Backend  -> http://localhost:4000
+  (You still need to create a user via the /signup call shown above.)
+
+
+======================================================================
+ STEP 3 — USE IT
+======================================================================
+  1. SEARCH  : pick a source (start with "google_maps"), enter a
+               keyword + city (e.g. "coffee shop", "Austin"), click Run.
+               You are taken to a live job page that auto-refreshes.
+  2. ACTORS  : promote/disable actors, or click "Test" to preview an
+               actor's output without saving leads.
+  3. LEADS   : browse collected leads; use "Export" for CSV / Excel / JSON.
+  4. JOBS    : see every run, its status, logs, and leads.
+
+
+======================================================================
+ NOTES
+======================================================================
+  - The seed data's Google Maps actors are REAL and work immediately.
+    The Apollo/LinkedIn actors are PLACEHOLDERS ("your-org/...").
+    Replace their "actor_ref" on the Actors page (or in seed.sql) with
+    an Apify actor you have access to before using those sources.
+
+  - Keys live ONLY in the backend. Never put the service_role key or the
+    Apify token in the frontend.
+
+
+======================================================================
+ TROUBLESHOOTING
+======================================================================
+  "Supabase is NOT configured"      -> fill SUPABASE_URL and
+                                       SUPABASE_SERVICE_ROLE_KEY in backend/.env
+  login error "fetch failed"        -> Supabase URL/keys wrong or backend
+                                       can't reach Supabase
+  search fails "provider_not_ready" -> APIFY_TOKEN missing/invalid
+  job fails "no_actor"              -> no active actor for that source
+                                       (add/activate one on the Actors page)
+  job fails "all_actors_failed"     -> wrong actor_ref or the Apify run
+                                       errored — open the job and read Logs
+
+  Full details:  lead-miner/docs/SETUP.md
+======================================================================

@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# Environment / secrets — NEVER commit these
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Local notes that may contain credentials
+subbabase setup.txt
+*secret*
+*credentials*
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
