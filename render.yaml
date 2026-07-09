@@ -1,0 +1,34 @@
+# Render Blueprint (repo root) — deploys the Lead Mining Platform backend.
+# The app lives in the lead-miner/ subfolder, so paths point in there.
+# https://render.com  →  New  →  Blueprint  →  pick this repo.
+# Fill the secret env vars (sync:false) in the Render dashboard when prompted.
+services:
+  - type: web
+    name: lead-miner-backend
+    runtime: docker
+    dockerfilePath: ./lead-miner/docker/Dockerfile.backend
+    dockerContext: ./lead-miner
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 4000
+      - key: NODE_ENV
+        value: production
+      # Set to your Vercel frontend URL after the frontend is deployed,
+      # e.g. https://apify-scrapper2.vercel.app
+      - key: CORS_ORIGIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: APIFY_TOKEN
+        sync: false
+      - key: FAILOVER_ENABLED
+        value: 'false'
+      - key: SYNC_JOBS
+        value: 'false'
