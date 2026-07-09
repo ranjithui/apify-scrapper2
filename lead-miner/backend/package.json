@@ -4,6 +4,9 @@
   "description": "Lead Mining Platform — provider-agnostic backend API",
   "type": "module",
   "main": "dist/server.js",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
